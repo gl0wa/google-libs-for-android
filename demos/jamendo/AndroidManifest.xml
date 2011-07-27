@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.google.android.demos.jamendo"
+    android:versionCode="1"
+    android:versionName="1.0">
+    <uses-sdk
+        android:minSdkVersion="3"
+        android:targetSdkVersion="4" />
+    <supports-screens
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:smallScreens="true"
+        android:anyDensity="true"
+        android:resizeable="true" />
+    <uses-permission
+        android:name="android.permission.INTERNET" />
+    <uses-permission
+        android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission
+        android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
+    <uses-permission
+        android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission
+        android:name="android.permission.MANAGE_ACCOUNTS" />
+    <uses-permission
+        android:name="android.permission.USE_CREDENTIALS" />
+    <uses-permission
+        android:name="android.permission.WRITE_SYNC_SETTINGS" />
+    <application
+        android:name=".app.JamendoApp"
+        android:label="@string/jamendo_title"
+        android:icon="@drawable/icon"
+        android:allowClearUserData="true"
+        android:debuggable="true">
+        <meta-data
+            android:name="android.app.default_searchable"
+            android:value=".app.SearchActivity" />
+        <provider
+            android:authorities="com.google.android.demos.jamendo"
+            android:name=".content.JamendoProvider"
+            android:label="@string/jamendo_content_provider_label" />
+        <service
+            android:name=".app.JamendoAuthenticatorService">
+            <intent-filter>
+                <action
+                    android:name="android.accounts.AccountAuthenticator" />
+                <action
+                    android:name="com.google.android.accounts.DatabaseAuthenticator" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/account_authenticator" />
+            <meta-data
+                android:name="com.google.android.accounts.DatabaseAuthenticator"
+                android:resource="@xml/database_authenticator" />
+        </service>
+        <service
+            android:name=".app.JamendoSyncAdapterService">
+            <intent-filter>
+                <action
+                    android:name="android.content.SyncAdapter" />
+            </intent-filter>
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/syncadapter" />
+        </service>
+        <activity
+            android:name=".app.JamendoAuthenticatorActivity"
+            android:theme="@android:style/Theme.Dialog"
+            android:label="@string/jamendo_login_title" />
+        <activity
+            android:name=".app.HomeActivity"
+            android:label="@string/jamendo_title">
+            <intent-filter
+                android:label="@string/jamendo_title">
+                <action
+                    android:name="android.intent.action.MAIN" />
+                <category
+                    android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".app.SearchActivity"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action
+                    android:name="android.intent.action.SEARCH" />
+                <category
+                    android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/jamendo_searchable" />
+        </activity>
+        <activity
+            android:name=".app.RadioListActivity"
+            android:label="@string/jamendo_radio_list_title" />
+        <activity
+            android:name=".app.AlbumListActivity"
+            android:label="@string/jamendo_album_list_title"
+            android:enabled="false">
+            <intent-filter>
+                <action
+                    android:name="android.intent.action.VIEW" />
+                <category
+                    android:name="android.intent.category.DEFAULT" />
+                <data
+                    android:mimeType="vnd.android.cursor.dir/vnd.com.google.android.demos.jamendo.album" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".app.AlbumGalleryActivity"
+            android:label="@string/jamendo_album_gallery_title">
+            <intent-filter>
+                <action
+                    android:name="android.intent.action.VIEW" />
+                <category
+                    android:name="android.intent.category.DEFAULT" />
+                <data
+                    android:mimeType="vnd.android.cursor.dir/vnd.com.google.android.demos.jamendo.album" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".app.AlbumActivity"
+            android:label="@string/jamendo_album_title">
+            <intent-filter>
+                <action
+                    android:name="android.intent.action.VIEW" />
+                <category
+                    android:name="android.intent.category.DEFAULT" />
+                <data
+                    android:mimeType="vnd.android.cursor.item/vnd.com.google.android.demos.jamendo.album" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".app.ArtistGalleryActivity"
+            android:label="@string/jamendo_artist_list_title">
+            <intent-filter>
+                <action
+                    android:name="android.intent.action.VIEW" />
+                <category
+                    android:name="android.intent.category.DEFAULT" />
+                <data
+                    android:mimeType="vnd.android.cursor.dir/vnd.com.google.android.demos.jamendo.artist" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".app.ArtistActivity"
+            android:label="@string/jamendo_artist_title">
+            <intent-filter>
+                <action
+                    android:name="android.intent.action.VIEW" />
+                <category
+                    android:name="android.intent.category.DEFAULT" />
+                <data
+                    android:mimeType="vnd.android.cursor.item/vnd.com.google.android.demos.jamendo.artist" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".app.TagListActivity"
+            android:label="@string/jamendo_tag_list_title">
+            <intent-filter>
+                <action
+                    android:name="android.intent.action.VIEW" />
+                <category
+                    android:name="android.intent.category.DEFAULT" />
+                <data
+                    android:mimeType="vnd.android.cursor.dir/vnd.com.google.android.demos.jamendo.tag" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".app.TagActivity"
+            android:label="@string/jamendo_tag_title">
+            <intent-filter>
+                <action
+                    android:name="android.intent.action.VIEW" />
+                <category
+                    android:name="android.intent.category.DEFAULT" />
+                <data
+                    android:mimeType="vnd.android.cursor.item/vnd.com.google.android.demos.jamendo.tag" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".app.UserListActivity"
+            android:label="@string/jamendo_user_list_title">
+            <intent-filter>
+                <action
+                    android:name="android.intent.action.VIEW" />
+                <category
+                    android:name="android.intent.category.DEFAULT" />
+                <data
+                    android:mimeType="vnd.android.cursor.dir/vnd.com.google.android.demos.jamendo.user" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".app.UserActivity"
+            android:label="@string/jamendo_user_title">
+            <intent-filter>
+                <action
+                    android:name="android.intent.action.VIEW" />
+                <category
+                    android:name="android.intent.category.DEFAULT" />
+                <data
+                    android:mimeType="vnd.android.cursor.item/vnd.com.google.android.demos.jamendo.user" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".app.ReviewListActivity"
+            android:label="@string/jamendo_review_list_title">
+            <intent-filter>
+                <action
+                    android:name="android.intent.action.VIEW" />
+                <category
+                    android:name="android.intent.category.DEFAULT" />
+                <data
+                    android:mimeType="vnd.android.cursor.dir/vnd.com.google.android.demos.jamendo.review" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".app.PlaylistListActivity"
+            android:label="@string/jamendo_playlist_list_title">
+            <intent-filter>
+                <action
+                    android:name="android.intent.action.VIEW" />
+                <category
+                    android:name="android.intent.category.DEFAULT" />
+                <data
+                    android:mimeType="vnd.android.cursor.dir/vnd.com.google.android.demos.jamendo.playlist" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".app.PlaylistActivity"
+            android:label="@string/jamendo_playlist_title">
+            <intent-filter>
+                <action
+                    android:name="android.intent.action.VIEW" />
+                <category
+                    android:name="android.intent.category.DEFAULT" />
+                <data
+                    android:mimeType="vnd.android.cursor.item/vnd.com.google.android.demos.jamendo.playlist" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:versionCode="1"
+    android:versionName="1.0"
+    package="com.google.android.demos.atom">
+    <uses-sdk
+        android:minSdkVersion="3"
+        android:targetSdkVersion="4" />
+    <supports-screens
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:smallScreens="true"
+        android:anyDensity="true"
+        android:resizeable="true" />
+    <uses-permission
+        android:name="android.permission.INTERNET" />
+    <application
+        android:label="@string/atom_title"
+        android:icon="@drawable/atom_icon"
+        android:theme="@android:style/Theme.Light"
+        android:debuggable="true">
+        <provider
+            android:authorities="com.google.android.demos.atom"
+            android:name=".content.AtomProvider" />
+        <activity
+            android:name=".app.FeedActivity"
+            android:label="@string/atom_title_feed"
+            android:launchMode="singleTop">
+            <intent-filter
+                android:label="@string/atom_title">
+                <action
+                    android:name="android.intent.action.MAIN" />
+                <category
+                    android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action
+                    android:name="android.intent.action.VIEW" />
+                <category
+                    android:name="android.intent.category.DEFAULT" />
+                <data
+                    android:mimeType="vnd.android.cursor.dir/vnd.com.google.android.demos.atom.entry" />
+            </intent-filter>
+            <intent-filter>
+                <action
+                    android:name="android.intent.action.SEARCH" />
+                <category
+                    android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <action
+                    android:name="android.intent.action.VIEW" />
+                <category
+                    android:name="android.intent.category.DEFAULT" />
+                <category
+                    android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="feed" />
+                <data
+                    android:scheme="http" />
+                <data
+                    android:mimeType="application/atom+xml" />
+            </intent-filter>
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/atom_searchable" />
+        </activity>
+    </application>
+</manifest>

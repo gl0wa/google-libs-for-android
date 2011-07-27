@@ -1,0 +1,37 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:paddingLeft="8dip"
+    android:paddingTop="1dip"
+    android:paddingRight="12dip"
+    android:paddingBottom="1dip"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="?android:attr/listPreferredItemHeight">
+    <TextView
+        android:text="N"
+        android:id="@+id/jamendo_track_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:paddingLeft="6dip"
+        android:layout_gravity="center_vertical" />
+    <TextView
+        android:text="Track"
+        android:id="@+id/jamendo_track_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:paddingLeft="8dip"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="1"
+        android:singleLine="true"
+        android:ellipsize="end" />
+    <TextView
+        android:text="00:00"
+        android:id="@+id/jamendo_track_duration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:paddingLeft="6dip"
+        android:layout_gravity="center_vertical" />
+</LinearLayout>

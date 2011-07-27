@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array
+        name="feeds">
+        <item>Boing Boing</item>
+        <item>Mashable!</item>
+        <item>TechCrunch</item>
+    </string-array>
+    <string-array
+        name="urls">
+        <item>http://feeds.boingboing.net/boingboing/iBag
+        </item>
+        <item>http://feeds.mashable.com/Mashable
+        </item>
+        <item>http://feeds.feedburner.com/TechCrunch
+        </item>
+    </string-array>
+</resources>

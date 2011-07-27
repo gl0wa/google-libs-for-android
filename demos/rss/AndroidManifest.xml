@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.google.android.demos.rss"
+    android:versionCode="1"
+    android:versionName="1.0">
+    <uses-sdk
+        android:minSdkVersion="3"
+        android:targetSdkVersion="4" />
+    <supports-screens
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:smallScreens="true"
+        android:anyDensity="true"
+        android:resizeable="true" />
+    <uses-permission
+        android:name="android.permission.INTERNET" />
+    <application
+        android:label="@string/rss_title"
+        android:icon="@drawable/rss_icon"
+        android:theme="@android:style/Theme.Light"
+        android:debuggable="true">
+        <provider
+            android:authorities="com.google.android.demos.rss"
+            android:name=".content.RssProvider" />
+        <activity
+            android:name=".app.ChannelActivity"
+            android:label="@string/rss_title_channel">
+            <intent-filter
+                android:label="@string/rss_title">
+                <action
+                    android:name="android.intent.action.MAIN" />
+                <category
+                    android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action
+                    android:name="android.intent.action.VIEW" />
+                <category
+                    android:name="android.intent.category.DEFAULT" />
+                <data
+                    android:mimeType="vnd.android.cursor.dir/vnd.com.google.android.demos.rss.item" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".app.LiveFolderActivity"
+            android:label="@string/rss_live_folder">
+            <intent-filter>
+                <action
+                    android:name="android.intent.action.CREATE_LIVE_FOLDER" />
+                <category
+                    android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

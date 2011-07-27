@@ -1,0 +1,8 @@
+#Mon Jul 05 01:18:18 GMT-05:00 2010
+eclipse.preferences.version=1
+formatter_profile=_Android
+formatter_settings_version=11
+org.eclipse.jdt.ui.ignorelowercasenames=true
+org.eclipse.jdt.ui.importorder=com;org;android;java;javax;
+org.eclipse.jdt.ui.ondemandthreshold=99
+org.eclipse.jdt.ui.staticondemandthreshold=99

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="jamendo_radio_list_title">Radios</string>
+  <string name="jamendo_radio_title">Radio</string>
+  <string name="jamendo_album_list_title">Albums</string>
+  <string name="jamendo_album_gallery_title">Album Gallery</string>
+  <string name="jamendo_album_title">Album</string>
+  <string name="jamendo_artist_list_title">Artists</string>
+  <string name="jamendo_artist_title">Artist</string>
+  <string name="jamendo_tag_list_title">Tags</string>
+  <string name="jamendo_tag_title">Tag</string>
+  <string name="jamendo_playlist_list_title">Playlists</string>
+  <string name="jamendo_playlist_title">Playlist</string>
+  <string name="jamendo_user_list_title">Members</string>
+  <string name="jamendo_user_title">Member</string>
+  <string name="jamendo_review_list_title">Reviews</string>
+  <string name="jamendo_review_title">Review</string>
+  <string name="jamendo_search_description">Artists, albums, and radios</string>
+  <string name="jamendo_search_title">Search</string>
+  <string name="jamendo_search_label">Search</string>
+  <string name="jamendo_menu_refresh">Refresh</string>
+  <string name="jamendo_menu_search">Search</string>
+  <string name="jamendo_menu_share">Share</string>
+  <string name="jamendo_choose_view_xspf">Open playlist (XSPF)</string>
+  <string name="jamendo_choose_view_m3u">Open playlist (M3U)</string>
+  <string name="jamendo_link_play">Play All</string>
+  <string name="jamendo_link_download">Download</string>
+  <string name="jamendo_button_retry">Retry</string>
+  <string name="jamendo_message_loading">Loading\u2026</string>
+  <string name="jamendo_message_error">No connection</string>
+  <string name="jamendo_template_album_artist">{0} by {1}</string>
+  <string name="jamendo_hint_username">Username</string>
+  <string name="jamendo_hint_password">Password</string>
+  <string name="jamendo_button_login">Login</string>
+  <string name="jamendo_button_cancel">Cancel</string>
+  <string name="jamendo_message_authenticating">Please wait while you are being logged-in&#8230;</string>
+  <string name="jamendo_account_title">My Profile</string>
+  <string name="jamendo_content_provider_label">My Profile</string>
+  <string name="jamendo_service_sync_text">Synchronizing profile\u2026</string>
+  <string name="retry">Retry</string>
+  <string name="no_connection">No connection</string>
+  <string name="list_title_tracks">Tracks</string>
+  <string name="list_title_albums">Albums</string>
+  <string name="list_title_latest_starred_albums">Latest Starred Albums</string>
+</resources>

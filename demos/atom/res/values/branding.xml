@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="atom_title">Atom Demo</string>
+  <string name="atom_title_feed">Atom Feed</string>
+  <string name="atom_title_entry">Atom Entry</string>
+</resources>

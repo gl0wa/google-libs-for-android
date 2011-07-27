@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="thumbnail_size">100px</dimen>
+    <dimen name="avatar_size">100px</dimen>
+    <dimen name="image_size">130px</dimen>
+    <dimen name="gallery_size">200px</dimen>
+</resources>

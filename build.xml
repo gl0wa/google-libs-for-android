@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="libs-for-android" default="all">
+    <property file="local.properties" />
+    <fail unless="sdk.dir" message="sdk.dir is not defined" />
+    <property name="src.dir" value="src" />
+    <property name="build.dir" value="bin" />
+    <property name="javadoc.dir" value="docs/api" />
+    <property name="platform" value="android-8" />
+    <property name="jar.dir" value="${build.dir}" />
+    <target name="clean">
+        <delete dir="${build.dir}" />
+    </target>
+    <target name="compile-feeds">
+        <mkdir dir="${build.dir}/classes/feeds" />
+        <javac includes="com/google/android/feeds/**"
+               destdir="${build.dir}/classes/feeds"
+               sourcepath=""
+               srcdir="src"
+               classpath="${sdk.dir}/platforms/${platform}/android.jar"
+               target="1.5"
+               debug="on" />
+    </target>
+    <target name="jar-feeds" depends="compile-feeds">
+        <mkdir dir="${jar.dir}" />
+        <jar destfile="${jar.dir}/feeds.jar">
+            <fileset dir="${build.dir}/classes/feeds" />
+            <fileset dir="src" includes="com/google/android/feeds/**" />
+        </jar>
+    </target>
+    <target name="compile-accounts">
+        <mkdir dir="${build.dir}/classes/accounts" />
+        <javac includes="com/google/android/accounts/**"
+               destdir="${build.dir}/classes/accounts"
+               sourcepath=""
+               srcdir="src"
+               classpath="${sdk.dir}/platforms/${platform}/android.jar"
+               target="1.5"
+               debug="on" />
+    </target>
+    <target name="jar-accounts" depends="compile-accounts">
+        <mkdir dir="${jar.dir}" />
+        <jar destfile="${jar.dir}/accounts.jar">
+            <fileset dir="${build.dir}/classes/accounts" />
+            <fileset dir="src" includes="com/google/android/accounts/*.java" />
+        </jar>
+    </target>
+    <target name="compile-filecache">
+        <mkdir dir="${build.dir}/classes/filecache" />
+        <javac includes="com/google/android/filecache/**"
+               destdir="${build.dir}/classes/filecache"
+               sourcepath=""
+               srcdir="src"
+               classpath="${sdk.dir}/platforms/${platform}/android.jar"
+               target="1.5"
+               debug="on" />
+    </target>
+    <target name="jar-filecache" depends="compile-filecache">
+        <mkdir dir="${jar.dir}" />
+        <jar destfile="${jar.dir}/filecache.jar">
+            <fileset dir="${build.dir}/classes/filecache" />
+            <fileset dir="src" includes="com/google/android/filecache/*.java" />
+        </jar>
+    </target>
+    <target name="compile-imageloader">
+        <mkdir dir="${build.dir}/classes/imageloader" />
+        <javac includes="com/google/android/imageloader/**"
+               destdir="${build.dir}/classes/imageloader"
+               sourcepath=""
+               srcdir="src"
+               classpath="${sdk.dir}/platforms/${platform}/android.jar"
+               target="1.5"
+               debug="on" />
+    </target>
+    <target name="jar-imageloader" depends="compile-imageloader">
+        <mkdir dir="${jar.dir}" />
+        <jar destfile="${jar.dir}/imageloader.jar">
+            <fileset dir="${build.dir}/classes/imageloader" />
+            <fileset dir="src" includes="com/google/android/imageloader/*.java" />
+        </jar>
+    </target>
+    <target name="compile-htmlwidget">
+        <mkdir dir="${build.dir}/classes/htmlwidget" />
+        <javac includes="com/google/android/htmlwidget/**"
+               destdir="${build.dir}/classes/htmlwidget"
+               sourcepath=""
+               srcdir="src"
+               classpath="${sdk.dir}/platforms/${platform}/android.jar:libs/tagsoup-1.2.jar"
+               target="1.5"
+               debug="on" />
+    </target>
+    <target name="jar-htmlwidget" depends="compile-htmlwidget">
+        <mkdir dir="${jar.dir}" />
+        <jar destfile="${jar.dir}/htmlwidget.jar">
+            <fileset dir="${build.dir}/classes/htmlwidget" />
+            <fileset dir="src" includes="com/google/android/htmlwidget/*.java" />
+        </jar>
+    </target>
+    <target name="javadoc">
+        <javadoc packagenames="com.google.android.*"
+                 sourcepath="src"
+                 classpath="${sdk.dir}/platforms/${platform}/android.jar:libs/tagsoup-1.2.jar"
+                 destdir="${javadoc.dir}"
+                 windowtitle="libs-for-android">
+            <group title="Accounts" packages="com.google.android.accounts" />
+            <group title="File Cache"
+                   packages="com.google.android.filecache" />
+            <group title="HTML Widget"
+                   packages="com.google.android.htmlwidget" />
+            <group title="Image Loader"
+                   packages="com.google.android.imageloader" />
+            <group title="Feed Framework"
+                   packages="com.google.android.feeds.*" />
+            <link href="http://developer.android.com/reference/"
+                  offline="true"
+                  packagelistLoc="docs/android" />
+        </javadoc>
+    </target>
+    <target name="all"
+            depends="jar-feeds,jar-accounts,jar-filecache,jar-imageloader,jar-htmlwidget" />
+</project>

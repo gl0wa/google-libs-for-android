@@ -1,0 +1,11 @@
+<searchable
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:label="@string/jamendo_search_label"
+    android:hint="@string/jamendo_search_hint"
+    android:searchSettingsDescription="@string/jamendo_search_description"
+    android:searchSuggestAuthority="com.google.android.demos.jamendo"
+    android:searchSuggestIntentAction="android.intent.action.VIEW"
+    android:includeInGlobalSearch="true"
+    android:queryAfterZeroResults="false"
+    android:searchSuggestThreshold="1">
+</searchable>

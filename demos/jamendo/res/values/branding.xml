@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="jamendo_title">Demo for Jamendo API</string>
+  <string name="jamendo_search_hint">Search albums</string>
+  <string name="jamendo_auth_token_label">Jamendo</string>
+  <string name="account_authenticator_label">Jamendo</string>
+  <string name="jamendo_login_title">Login to Jamendo</string>
+</resources>

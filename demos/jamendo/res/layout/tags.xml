@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <TextView
+        android:id="@android:id/text1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/tagcloud"
+        android:lineSpacingMultiplier="1.5"
+        android:gravity="center"
+        android:paddingLeft="16dip"
+        android:paddingTop="8dip"
+        android:paddingRight="16dip"
+        android:paddingBottom="8dip" />
+</ScrollView>

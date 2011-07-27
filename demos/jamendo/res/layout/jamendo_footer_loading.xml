@@ -1,0 +1,24 @@
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="?android:attr/listPreferredItemHeight"
+        android:padding="5dip"
+        android:orientation="horizontal"
+        android:gravity="center">
+        <ProgressBar
+            style="?android:attr/progressBarStyleSmall"
+            android:indeterminate="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:layout_marginBottom="1dip"
+            android:paddingLeft="5dip"
+            android:text="@string/jamendo_message_loading" />
+    </LinearLayout>
+</FrameLayout>

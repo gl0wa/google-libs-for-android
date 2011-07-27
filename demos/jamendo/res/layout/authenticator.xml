@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="6dip">
+        <EditText
+            android:id="@android:id/text1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/jamendo_hint_username"
+            android:inputType="text" />
+        <EditText
+            android:id="@android:id/text2"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/jamendo_hint_password"
+            android:inputType="textPassword" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right">
+            <Button
+                android:id="@android:id/button1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/jamendo_button_login"
+                android:layout_weight="1"
+                android:minEms="8" />
+            <Button
+                android:id="@android:id/button2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/jamendo_button_cancel"
+                android:layout_weight="1"
+                android:minEms="8" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

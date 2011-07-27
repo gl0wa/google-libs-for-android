@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<array name="home_name">
+		<item>Albums</item>
+		<item>Artists</item>
+		<item>Tags</item>
+		<item>Playlists</item>
+		<item>Members</item>
+		<item>Reviews</item>
+	</array>
+	<array name="home_uri">
+		<item>content://com.google.android.demos.jamendo/albums
+		</item>
+		<item>content://com.google.android.demos.jamendo/artists
+		</item>
+		<item>content://com.google.android.demos.jamendo/tags</item>
+		<item>content://com.google.android.demos.jamendo/playlists
+		</item>
+		<item>content://com.google.android.demos.jamendo/users
+		</item>
+		<item>content://com.google.android.demos.jamendo/reviews
+		</item>
+	</array>
+	<array name="home_order">
+		<item>ratingmonth_desc</item>
+		<item>listened_desc</item>
+		<item>idstr_asc</item>
+		<item>createddate_desc</item>
+		<item>id_asc</item>
+		<item>id_desc</item>
+	</array>
+	<array name="radio_name">
+		<item>Rock</item>
+		<item>Pop / Songwriting</item>
+		<item>Jazz</item>
+		<item>Hip-Hop</item>
+		<item>Lounge</item>
+		<item>Dance / Electro</item>
+	</array>
+	<array name="radio_uri">
+		<item>http://www.jamendo.com/get2/stream/track/m3u/radio_track_inradioplaylist/?order=numradio_asc&amp;radio_id=9</item>
+		<item>http://www.jamendo.com/get2/stream/track/m3u/radio_track_inradioplaylist/?order=numradio_asc&amp;radio_id=8</item>
+		<item>http://www.jamendo.com/get2/stream/track/m3u/radio_track_inradioplaylist/?order=numradio_asc&amp;radio_id=6</item>
+		<item>http://www.jamendo.com/get2/stream/track/m3u/radio_track_inradioplaylist/?order=numradio_asc&amp;radio_id=5</item>
+		<item>http://www.jamendo.com/get2/stream/track/m3u/radio_track_inradioplaylist/?order=numradio_asc&amp;radio_id=7</item>
+		<item>http://www.jamendo.com/get2/stream/track/m3u/radio_track_inradioplaylist/?order=numradio_asc&amp;radio_id=4</item>
+	</array>
+	<array name="radio_type">
+    <item>audio/x-mpegurl</item>
+    <item>audio/x-mpegurl</item>
+    <item>audio/x-mpegurl</item>
+    <item>audio/x-mpegurl</item>
+    <item>audio/x-mpegurl</item>
+    <item>audio/x-mpegurl</item>
+  </array>
+</resources>

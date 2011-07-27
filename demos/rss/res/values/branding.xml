@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="rss_title">RSS Demo</string>
+  <string name="rss_title_channel">RSS Channel</string>
+  <string name="rss_title_item">RSS Item</string>
+</resources>

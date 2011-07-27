@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="atom_menu_refresh">Refresh</string>
+	<string name="atom_menu_search">Go</string>
+	<string name="atom_menu_share">Share</string>
+	<string name="atom_search_label">Search</string>
+	<string name="atom_search_hint">Enter feed URL</string>
+	<string name="atom_error_invalid_url">Invalid URL: {0}</string>
+	<string name="atom_button_ok">OK</string>
+	<string name="retry">Retry</string>
+	<string name="no_connection">No connection</string>
+</resources>
