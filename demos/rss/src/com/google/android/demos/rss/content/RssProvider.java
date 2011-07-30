@@ -17,8 +17,8 @@
 package com.google.android.demos.rss.content;
 
 import com.google.android.demos.rss.provider.RssContract.Items;
-import com.google.android.feeds.content.FeedLoader;
-import com.google.android.feeds.content.FeedProvider;
+import com.google.android.feeds.FeedLoader;
+import com.google.android.feeds.FeedProvider;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -101,7 +101,7 @@ public class RssProvider extends ContentProvider {
             FeedLoader.loadFeed(handler, feedUri);
             return FeedProvider.feedCursor(output, extras);
         } catch (Throwable t) {
-            return FeedProvider.errorCursor(output, extras, t);
+            return FeedProvider.errorCursor(output, extras, t, null);
         }
     }
 

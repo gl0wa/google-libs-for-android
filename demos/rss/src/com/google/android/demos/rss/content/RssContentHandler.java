@@ -18,8 +18,8 @@ package com.google.android.demos.rss.content;
 
 import com.google.android.demos.rss.provider.RssContract.Channels;
 import com.google.android.demos.rss.provider.RssContract.Items;
-import com.google.android.feeds.content.FeedLoader;
-import com.google.android.feeds.net.XmlContentHandler;
+import com.google.android.feeds.FeedLoader;
+import com.google.android.feeds.XmlContentHandler;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
