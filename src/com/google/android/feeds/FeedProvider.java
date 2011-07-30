@@ -14,25 +14,22 @@
  * limitations under the License.
  */
 
-package com.google.android.feeds.content;
+package com.google.android.feeds;
 
-import com.google.android.feeds.provider.FeedContract;
-
+import android.app.Activity;
 import android.content.ContentProvider;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.CrossProcessCursor;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
-
-import java.io.IOException;
-import java.net.HttpURLConnection;
 
 /**
  * Creates {@link Cursor} wrappers that include error information and other
  * meta-data.
  */
-public class FeedProvider {
+public final class FeedProvider {
 
     /**
      * Ensures that the query has been evaluated.
@@ -61,9 +58,10 @@ public class FeedProvider {
 
     /**
      * Creates a cursor with meta-data.
-     *
+     * 
      * @param cursor the {@link Cursor} to wrap.
-     * @param extras meta-data, such as {@link FeedContract#EXTRA_MORE}.
+     * @param extras meta-data, such as {@link FeedExtras#EXTRA_MORE} or
+     *            {@link FeedExtras#EXTRA_TIMESTAMP}.
      * @return the wrapped cursor.
      */
     public static Cursor feedCursor(Cursor cursor, Bundle extras) {
@@ -72,46 +70,40 @@ public class FeedProvider {
 
     /**
      * Creates a cursor with error data.
-     *
+     * 
      * @param cursor the cursor to wrap. When there is an error, the provider
      *            should generally return any data that is cached locally. For
      *            example, if the first 10 items are available locally, it is
      *            usually best to show them to the user even if the next 10
      *            items are unavailable.
-     * @param extras meta-data, such as {@link FeedContract#EXTRA_MORE}. The
-     *            flag {@link FeedContract#EXTRA_MORE} should be set if there
-     *            are more items, even if there was an error so that the UI can
-     *            retry the operation to load more items after the network
-     *            connection has been restored.
+     * @param extras meta-data, such as {@link FeedExtras#EXTRA_MORE}. The flag
+     *            {@link FeedExtras#EXTRA_MORE} should be set if there are more
+     *            items, even if there was an error so that the UI can retry the
+     *            operation to load more items after the network connection has
+     *            been restored.
      * @param t the exception that was thrown. The calling code should catch
-     *            {@link Throwable} in {@link
-     *            ContentProvider#query(android.net.Uri, String[], String,
-     *            String[], String)} otherwise {@link
-     *            ContentResolver#query(android.net.Uri, String[], String,
-     *            String[], String)} will return {@code null} by default.
+     *            {@link Throwable} in
+     *            {@link ContentProvider#query(Uri, String[], String, String[], String)}
+     *            otherwise
+     *            {@link ContentResolver#query(Uri, String[], String, String[], String)}
+     *            will return {@code null} by default.
+     * @param solution an {@link Intent} that starts an {@link Activity} to
+     *            address the error (for example, opens the device network
+     *            settings or a Wi-Fi hotspot login page), or {@code null}.
      * @return the wrapped cursor.
-     * @see UnauthorizedException
+     * @see FeedExtras#EXTRA_ERROR
+     * @see FeedExtras#EXTRA_SOLUTION
      */
-    public static Cursor errorCursor(Cursor cursor, Bundle extras, Throwable t) {
-        int responseCode = HttpURLConnection.HTTP_INTERNAL_ERROR;
-        String responseMessage = t.getMessage();
-        Intent solution = null;
-        if (t instanceof UnauthorizedException) {
-            UnauthorizedException e = (UnauthorizedException) t;
-            responseCode = HttpURLConnection.HTTP_UNAUTHORIZED;
-            solution = e.getSolution();
-        } else if (t instanceof IOException) {
-            responseCode = HttpURLConnection.HTTP_BAD_GATEWAY;
+    public static Cursor errorCursor(Cursor cursor, Bundle extras, Throwable t, Intent solution) {
+        if (extras == null) {
+            throw new NullPointerException("Bundle is null");
         }
-        if (responseMessage == null) {
-            // Use the exception class name as an error message
-            Class<? extends Throwable> type = t.getClass();
-            responseMessage = type.getSimpleName();
+        if (t == null) {
+            throw new NullPointerException("Throwable is null");
         }
-        extras.putInt(FeedContract.EXTRA_RESPONSE_CODE, responseCode);
-        extras.putString(FeedContract.EXTRA_RESPONSE_MESSAGE, responseMessage);
+        extras.putSerializable(FeedExtras.EXTRA_ERROR, t);
         if (solution != null) {
-            extras.putParcelable(FeedContract.EXTRA_SOLUTION, solution);
+            extras.putParcelable(FeedExtras.EXTRA_SOLUTION, solution);
         }
         return feedCursor(cursor, extras);
     }

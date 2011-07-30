@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.feeds.widget;
+package com.google.android.feeds;
 
 import android.database.CrossProcessCursor;
 import android.database.CursorWindow;

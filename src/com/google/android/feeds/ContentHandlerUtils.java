@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.feeds.net;
+package com.google.android.feeds;
 
 import org.apache.http.HeaderElement;
 import org.apache.http.NameValuePair;

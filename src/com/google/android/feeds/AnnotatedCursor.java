@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.feeds.content;
+package com.google.android.feeds;
 
 import android.database.Cursor;
 import android.database.CursorWrapper;

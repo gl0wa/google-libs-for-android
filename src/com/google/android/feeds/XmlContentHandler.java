@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.feeds.net;
+package com.google.android.feeds;
 
 import org.xml.sax.SAXException;
 
@@ -27,6 +27,9 @@ import java.net.URLConnection;
 
 /**
  * {@link java.net.ContentHandler} implementation for reading XML documents.
+ * <p>
+ * Use {@link #parse(URLConnection, org.xml.sax.ContentHandler)} as a helper to
+ * implement the abstract method {@link #getContent(URLConnection)}.
  */
 public abstract class XmlContentHandler extends ContentHandler {
 

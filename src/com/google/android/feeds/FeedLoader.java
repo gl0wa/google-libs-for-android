@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.feeds.content;
-
-import com.google.android.feeds.provider.FeedContract;
+package com.google.android.feeds;
 
 import android.database.MatrixCursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -130,7 +128,7 @@ public class FeedLoader {
      *            of items in the output may be more or less, depending on
      *            availability.
      * @param extras a {@link Bundle} to store meta-data like
-     *            {@link FeedContract#EXTRA_MORE}.
+     *            {@link FeedExtras#EXTRA_MORE}.
      * @throws IOException if there is an error loading one of the documents.
      */
     public static void loadIndexedFeed(ContentHandler handler, Uri baseDocumentUri,
@@ -152,7 +150,7 @@ public class FeedLoader {
 
             // If the page is full, there are probably more pages
             hasMore = documentItemCount >= pageSize;
-            extras.putBoolean(FeedContract.EXTRA_MORE, hasMore);
+            extras.putBoolean(FeedExtras.EXTRA_MORE, hasMore);
 
             // Update the current index
             index += documentItemCount;
@@ -187,7 +185,7 @@ public class FeedLoader {
      *            of items in the output may be more or less, depending on
      *            availability.
      * @param extras a {@link Bundle} to store meta-data like
-     *            {@link FeedContract#EXTRA_MORE}.
+     *            {@link FeedExtras#EXTRA_MORE}.
      * @throws IOException if there is an error loading one of the documents.
      */
     public static void loadPagedFeed(ContentHandler handler, Uri baseDocumentUri,
@@ -210,7 +208,7 @@ public class FeedLoader {
 
             // If the page is full, there are probably more pages
             morePages = documentItemCount >= pageSize;
-            extras.putBoolean(FeedContract.EXTRA_MORE, morePages);
+            extras.putBoolean(FeedExtras.EXTRA_MORE, morePages);
 
             // Set the next page number
             page += 1;
@@ -235,7 +233,7 @@ public class FeedLoader {
      *            of items in the output may be more or less, depending on
      *            availability.
      * @param extras a {@link Bundle} to store meta-data like
-     *            {@link FeedContract#EXTRA_MORE}.
+     *            {@link FeedExtras#EXTRA_MORE}.
      * @throws IOException if there is an error loading one of the documents.
      */
     public static void loadContinuedFeed(ContentHandler handler, Uri baseDocumentUri,
@@ -250,7 +248,7 @@ public class FeedLoader {
             DocumentInfo document = loadDocument(handler, documentUri.build());
 
             continuation = document.continuationToken();
-            extras.putBoolean(FeedContract.EXTRA_MORE, continuation != null);
+            extras.putBoolean(FeedExtras.EXTRA_MORE, continuation != null);
 
             int documentItemCount = document.itemCount();
             if (documentItemCount < 0) {

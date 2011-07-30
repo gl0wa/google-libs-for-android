@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.feeds.net;
+package com.google.android.feeds;
 
 import org.json.JSONArray;
 import org.json.JSONException;

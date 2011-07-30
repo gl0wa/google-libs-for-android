@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.feeds.content;
-
-import com.google.android.feeds.provider.FeedContract;
+package com.google.android.feeds;
 
 import android.os.Bundle;
 
@@ -43,10 +41,10 @@ public abstract class AbstractCachedContentHandler extends ContentHandler {
 
     /**
      * Constructor.
-     *
+     * 
      * @param maxAge the maximum age for cached content.
      * @param extras the age of the cached content is written to this
-     *            {@link Bundle} as {@link FeedContract#EXTRA_TIMESTAMP}.
+     *            {@link Bundle} as {@link FeedExtras#EXTRA_TIMESTAMP}.
      */
     protected AbstractCachedContentHandler(long maxAge, Bundle extras) {
         if (maxAge < 0) {
@@ -75,7 +73,7 @@ public abstract class AbstractCachedContentHandler extends ContentHandler {
             // Must refresh when timestamp is not set
             return false;
         }
-        mExtras.putLong(FeedContract.EXTRA_TIMESTAMP, timestamp);
+        mExtras.putLong(FeedExtras.EXTRA_TIMESTAMP, timestamp);
         if (mMaxAge == Long.MAX_VALUE) {
             // Never refresh when max-age is set to maximum value
             return true;
@@ -106,7 +104,7 @@ public abstract class AbstractCachedContentHandler extends ContentHandler {
 
             // Update the timestamp if no exception is thrown
             setTimestamp(connection, timestamp);
-            mExtras.putLong(FeedContract.EXTRA_TIMESTAMP, timestamp);
+            mExtras.putLong(FeedExtras.EXTRA_TIMESTAMP, timestamp);
 
             return content;
         }
