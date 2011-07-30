@@ -16,32 +16,34 @@
 
 package com.google.android.demos.atom.widget;
 
-import com.google.android.demos.atom.R;
 import com.google.android.demos.atom.provider.AtomContract.Entries;
 import com.google.android.demos.atom.provider.AtomContract.Feeds;
-import com.google.android.feeds.widget.AdapterState;
-import com.google.android.feeds.widget.BaseFeedAdapter;
+import com.google.android.feeds.FeedExtras;
 
-import android.app.ListActivity;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.ListView;
 import android.widget.TextView;
 
 /**
  * Adapter for an Atom feed.
  */
-public class FeedAdapter extends BaseFeedAdapter {
+public class FeedAdapter extends CursorAdapter {
     private static final String[] PROJECTION = {
             Entries._ID, Entries.TITLE_PLAINTEXT, Entries.SUMMARY, Entries.CONTENT,
             Entries.ALTERNATE_HREF
     };
+
+    public static Loader<Cursor> createLoader(Context context, Uri uri) {
+        return new CursorLoader(context, uri, PROJECTION, null, null, null);
+    }
 
     private static final int COLUMN_TITLE = 1;
 
@@ -50,21 +52,6 @@ public class FeedAdapter extends BaseFeedAdapter {
     private static final int COLUMN_CONTENT = 3;
 
     private static final int COLUMN_ALTERNATE_HREF = 4;
-
-    private static void setViewVisible(View view, boolean visible) {
-        if (view != null) {
-            int visibility = visible ? View.VISIBLE : View.GONE;
-            if (visibility != view.getVisibility()) {
-                view.setVisibility(visibility);
-            }
-        }
-    }
-
-    private static void setWindowIndeterminateProgressVisible(Window window, boolean visible) {
-        int featureId = Window.FEATURE_INDETERMINATE_PROGRESS;
-        int value = visible ? Window.PROGRESS_VISIBILITY_ON : Window.PROGRESS_VISIBILITY_OFF;
-        window.setFeatureInt(featureId, value);
-    }
 
     public static void setEntryData(EntryDialog entryDialog, Cursor cursor) {
         Bundle extras = cursor.getExtras();
@@ -76,80 +63,8 @@ public class FeedAdapter extends BaseFeedAdapter {
         entryDialog.setData(title, url, summary, content, feed);
     }
 
-    private final View mEmpty;
-
-    private final View mLoading;
-
-    private final View mError;
-
-    private final Window mWindow;
-    
-    private AdapterState mAdapterState;
-
-    public FeedAdapter(ListActivity activity, int queryId) {
-        super(activity, queryId);
-        ListView listView = activity.getListView();
-        mAdapterState = new AdapterState();
-        mAdapterState.setAdapter(this);
-        mAdapterState.setAdapterView(listView);
-        mEmpty = activity.findViewById(android.R.id.empty);
-        mLoading = activity.findViewById(R.id.loading);
-        mError = activity.findViewById(R.id.error);
-        mWindow = activity.getWindow();
-        mError.findViewById(R.id.retry).setOnClickListener(new View.OnClickListener() {
-            /** {@inheritDoc} */
-            public void onClick(View v) {
-                retry();
-            }
-        });
-    }
-    
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mAdapterState.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public void onRestoreInstanceState(Bundle state) {
-        super.onRestoreInstanceState(state);
-        mAdapterState.onRestoreInstanceState(state);
-    }
-
-    @Override
-    public void notifyDataSetChanged() {
-        super.notifyDataSetChanged();
-        Cursor cursor = getCursor();
-        Bundle extras = cursor.getExtras();
-        String title = extras.getString(Feeds.TITLE_PLAINTEXT);
-        if (title != null) {
-            mWindow.setTitle(title);
-        }
-    }
-
-    @Override
-    protected void onQueryStateChanged() {
-        super.onQueryStateChanged();
-        setViewVisible(mEmpty, false);
-        setViewVisible(mLoading, false);
-        setViewVisible(mError, false);
-        setWindowIndeterminateProgressVisible(mWindow, false);
-        boolean isLoaded = hasCursor() && isQueryDone();
-        if (isLoaded) {
-            if (isEmpty()) {
-                if (hasError()) {
-                    setViewVisible(mError, true);
-                } else {
-                    setViewVisible(mEmpty, true);
-                }
-            }
-        } else {
-            if (isEmpty()) {
-                setViewVisible(mLoading, true);
-            } else {
-                setWindowIndeterminateProgressVisible(mWindow, true);
-            }
-        }
+    public FeedAdapter(Context context) {
+        super(context, null, 0);
     }
 
     @Override
@@ -164,13 +79,9 @@ public class FeedAdapter extends BaseFeedAdapter {
         TextView text1 = (TextView) view.findViewById(android.R.id.text1);
         text1.setText(title);
     }
-
-    public void changeFeedUrl(String url) {
-        if (url != null) {
-            Uri uri = Entries.contentUri(url);
-            changeQuery(uri, PROJECTION, null, null, null);
-        } else {
-            clear();
-        }
+    
+    public boolean hasError() {
+        Cursor cursor = getCursor();
+        return cursor != null && cursor.getExtras().containsKey(FeedExtras.EXTRA_ERROR);
     }
 }

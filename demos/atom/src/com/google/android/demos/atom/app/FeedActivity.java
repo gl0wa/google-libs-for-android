@@ -24,19 +24,24 @@ import com.google.android.demos.atom.widget.FeedAdapter;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ListActivity;
 import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.DataSetObserver;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.text.MessageFormat;
@@ -46,13 +51,15 @@ import java.text.MessageFormat;
  * <p>
  * Feed entries are displayed in a dialog managed by the feed for efficiency.
  */
-public class FeedActivity extends ListActivity {
+public class FeedActivity extends FragmentActivity implements
+        LoaderManager.LoaderCallbacks<Cursor>, AdapterView.OnItemClickListener,
+        View.OnClickListener {
 
     private static final int DIALOG_ENTRY = 1;
 
     private static final int DIALOG_INVALID_URL = 2;
 
-    private static final int QUERY_ENTRIES = 1;
+    private static final int LOADER_ENTRIES = 1;
 
     /**
      * Preference key for the URL of the last accessed feed. This is a really
@@ -72,6 +79,12 @@ public class FeedActivity extends ListActivity {
     private SharedPreferences mPreferences;
 
     private String mInvalidUrl;
+    
+    private View mEmpty;
+
+    private View mLoading;
+
+    private View mError;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,46 +92,78 @@ public class FeedActivity extends ListActivity {
 
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.list_activity);
+        ListView listView = (ListView) findViewById(android.R.id.list);
+        mEmpty = findViewById(R.id.empty);
+        mLoading = findViewById(R.id.loading);
+        mError = findViewById(R.id.error);
+        mError.findViewById(R.id.retry).setOnClickListener(this);
+
+        // Loader from last Activity instance may still be loading
+        mLoading.setVisibility(View.VISIBLE);
+        mEmpty.setVisibility(View.GONE);
+        mError.setVisibility(View.GONE);
 
         mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        mAdapter = new FeedAdapter(this, QUERY_ENTRIES);
-
-        // Configure the ListActivity to use the feed adapter,
-        // not the inner adapter (using the inner adapter directly would work,
-        // but would not provide status information or a way
-        // for the user to retry their request).
-        setListAdapter(mAdapter);
-
+        mAdapter = new FeedAdapter(this);
+        mAdapter.registerDataSetObserver(new TitleObserver());
+        listView.setAdapter(mAdapter);
+        listView.setOnItemClickListener(this);
+        getSupportLoaderManager().initLoader(LOADER_ENTRIES, Bundle.EMPTY, this);
+    }
+    
+    private Uri getContentUri() {
         Intent intent = getIntent();
-        Uri uri = intent.getData();
-        String feedUrl = uri != null ? Entries.getFeedUrl(uri) : mPreferences.getString(
-                PREFERENCE_FEED, DEFAULT_FEED);
-        mAdapter.changeFeedUrl(feedUrl);
+        Uri data = intent.getData();
+        String type = intent.resolveType(this);
+        if (Entries.CONTENT_TYPE.equals(type)) {
+            return data;
+        } else if ("application/atom+xml".equalsIgnoreCase(type)) {
+            return Entries.contentUri(data.toString());
+        } else {
+            String channelUrl = mPreferences.getString(PREFERENCE_FEED, DEFAULT_FEED);
+            return Entries.contentUri(channelUrl);
+        }
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mAdapter.onSaveInstanceState(outState);
+    /**
+     * {@inheritDoc}
+     */
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        mLoading.setVisibility(mAdapter.isEmpty() ? View.VISIBLE : View.GONE);
+        mEmpty.setVisibility(View.GONE);
+        mError.setVisibility(View.GONE);
+        setWindowIndeterminateProgressVisible(!mAdapter.isEmpty());
+        Context context = this;
+        Uri uri = getContentUri();
+        return FeedAdapter.createLoader(context, uri);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mAdapter.swapCursor(data);
+        mLoading.setVisibility(View.GONE);
+        mEmpty.setVisibility(mAdapter.isEmpty() && !mAdapter.hasError() ? View.VISIBLE : View.GONE);
+        mError.setVisibility(mAdapter.isEmpty() && mAdapter.hasError() ? View.VISIBLE : View.GONE);
+        setWindowIndeterminateProgressVisible(false);
     }
 
-    @Override
-    protected void onRestoreInstanceState(Bundle state) {
-        super.onRestoreInstanceState(state);
-        mAdapter.onRestoreInstanceState(state);
+    /**
+     * {@inheritDoc}
+     */
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mAdapter.swapCursor(null);
+        mLoading.setVisibility(View.GONE);
+        mEmpty.setVisibility(View.GONE);
+        mError.setVisibility(View.GONE);
+        setWindowIndeterminateProgressVisible(false);
     }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mAdapter.onResume();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mAdapter.onStop();
+    
+    private void setWindowIndeterminateProgressVisible(boolean value) {
+        getWindow().setFeatureInt(Window.FEATURE_INDETERMINATE_PROGRESS,
+                value ? Window.PROGRESS_VISIBILITY_ON : Window.PROGRESS_VISIBILITY_OFF);
     }
 
     @Override
@@ -127,6 +172,7 @@ public class FeedActivity extends ListActivity {
         // different feed URL. The same activity instance is reused, so it needs
         // to be updated to show a different feed. You don't need to worry about
         // implementing this method unless you have set launchMode="singleTop".
+        setIntent(intent);
         String action = intent.getAction();
         if (Intent.ACTION_SEARCH.equals(action)) {
             String feedUrl = intent.getStringExtra(SearchManager.QUERY);
@@ -136,13 +182,12 @@ public class FeedActivity extends ListActivity {
                 SharedPreferences.Editor editor = mPreferences.edit();
                 editor.putString(PREFERENCE_FEED, feedUrl);
                 editor.commit();
-
-                mAdapter.changeFeedUrl(feedUrl);
             } else {
                 mInvalidUrl = feedUrl;
                 showDialog(DIALOG_INVALID_URL);
             }
         }
+        reload();
     }
 
     @Override
@@ -173,8 +218,10 @@ public class FeedActivity extends ListActivity {
         }
     }
 
-    @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
+    /**
+     * {@inheritDoc}
+     */
+    public void onItemClick(AdapterView<?> l, View v, int position, long id) {
         Object item = l.getItemAtPosition(position);
         Cursor cursor = mAdapter.getCursor();
         if (item != null && item == cursor) {
@@ -196,13 +243,40 @@ public class FeedActivity extends ListActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_refresh:
-                mAdapter.refresh();
+                reload();
                 return true;
             case R.id.menu_search:
                 onSearchRequested();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.retry:
+                reload();
+                break;
+        }
+    }
+
+    private void reload() {
+        getSupportLoaderManager().restartLoader(LOADER_ENTRIES, Bundle.EMPTY, this);
+    }
+
+    private final class TitleObserver extends DataSetObserver {
+        @Override
+        public void onChanged() {
+            Cursor cursor = mAdapter.getCursor();
+            Bundle extras = cursor.getExtras();
+            String title = extras.getString(Feeds.TITLE_PLAINTEXT);
+            if (title != null) {
+                setTitle(title);
+            }
         }
     }
 }

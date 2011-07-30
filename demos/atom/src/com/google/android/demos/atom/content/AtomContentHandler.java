@@ -19,8 +19,8 @@ package com.google.android.demos.atom.content;
 import com.google.android.demos.atom.provider.AtomContract.Entries;
 import com.google.android.demos.atom.provider.AtomContract.FeedsColumns;
 import com.google.android.demos.atom.provider.AtomContract.LinksColumns;
-import com.google.android.feeds.content.FeedLoader;
-import com.google.android.feeds.net.XmlContentHandler;
+import com.google.android.feeds.FeedLoader;
+import com.google.android.feeds.XmlContentHandler;
 
 import org.xml.sax.Attributes;
 
