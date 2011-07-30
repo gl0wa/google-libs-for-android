@@ -22,18 +22,19 @@ import com.google.android.imageloader.ImageLoader;
 import android.app.SearchManager;
 import android.content.Context;
 import android.database.Cursor;
+import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class SearchAdapter extends JamendoFeedAdapter {
+public class SearchAdapter extends CursorAdapter {
     
     private final ImageLoader mImageLoader;
 
-    public SearchAdapter(Context context, int queryId) {
-        super(context, queryId);
+    public SearchAdapter(Context context) {
+        super(context, null, 0);
         mImageLoader = ImageLoader.get(context);
     }
 

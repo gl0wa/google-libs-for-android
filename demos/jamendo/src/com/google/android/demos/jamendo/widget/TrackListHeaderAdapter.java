@@ -30,12 +30,16 @@ import android.widget.TextView;
 
 abstract class TrackListHeaderAdapter extends SimpleFeedAdapter {
 
+    private static final String PLAYLIST_FORMAT = JamendoContract.FORMAT_M3U;
+
+    private static final String PLAYLIST_CONTENT_TYPE = JamendoContract.CONTENT_TYPE_M3U;
+
     private final boolean mPlaylistStreamingSupported;
 
-    protected TrackListHeaderAdapter(Activity context, int queryId, int layout, String[] from,
-            int[] to) {
-        super(context, queryId, layout, from, to);
-        mPlaylistStreamingSupported = JamendoApp.isPlaylistStreamingSupported(context);
+    protected TrackListHeaderAdapter(Activity context, int layout, String[] from, int[] to) {
+        super(context, layout, from, to);
+        mPlaylistStreamingSupported = JamendoApp.isPlaylistStreamingSupported(context,
+                PLAYLIST_CONTENT_TYPE);
     }
 
     @Override
@@ -46,13 +50,11 @@ abstract class TrackListHeaderAdapter extends SimpleFeedAdapter {
                 if (mPlaylistStreamingSupported) {
                     Context context = view.getContext();
                     CharSequence text = context.getText(R.string.jamendo_link_play);
-                    String format = JamendoContract.FORMAT_M3U;
                     String columnName = cursor.getColumnName(columnIndex);
                     long id = cursor.getLong(columnIndex);
-                    Uri data = JamendoContract.createPlaylistUri(format, columnName, id);
-                    String type = JamendoContract.CONTENT_TYPE_M3U;
+                    Uri data = JamendoContract.createPlaylistUri(PLAYLIST_FORMAT, columnName, id);
                     Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setDataAndType(data, type);
+                    intent.setDataAndType(data, PLAYLIST_CONTENT_TYPE);
                     JamendoApp.setTextToLink(link1, text, intent);
                 } else {
                     link1.setText("");

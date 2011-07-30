@@ -37,8 +37,8 @@ public class AlbumHeaderAdapter extends TrackListHeaderAdapter {
             R.id.icon, R.id.text1, R.id.text2, R.id.text3, R.id.link1, R.id.link2
     };
 
-    public AlbumHeaderAdapter(Activity context, int queryId) {
-        super(context, queryId, R.layout.jamendo_header, FROM, TO);
+    public AlbumHeaderAdapter(Activity context) {
+        super(context, R.layout.jamendo_header, FROM, TO);
     }
 
     @Override

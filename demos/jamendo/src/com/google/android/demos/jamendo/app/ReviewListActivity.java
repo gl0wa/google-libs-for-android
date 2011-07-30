@@ -27,7 +27,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ListView;
+import android.widget.AdapterView;
 
 public class ReviewListActivity extends JamendoListActivity {
 
@@ -64,8 +64,8 @@ public class ReviewListActivity extends JamendoListActivity {
         };
     }
 
-    @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
+    /** {@inheritDoc} */
+    public void onItemClick(AdapterView<?> l, View v, int position, long id) {
         // TODO: Open review instead of album
         Object item = l.getItemAtPosition(position);
         Cursor cursor = mAdapter.getCursor();

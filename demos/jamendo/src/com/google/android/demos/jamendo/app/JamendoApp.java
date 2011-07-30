@@ -88,10 +88,9 @@ public class JamendoApp extends Application {
         addLinkMovementMethod(textView);
     }
 
-    public static boolean isPlaylistStreamingSupported(Context context) {
+    public static boolean isPlaylistStreamingSupported(Context context, String type) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        Uri data = JamendoContract.createRadioUri(JamendoContract.FORMAT_M3U, 0L);
-        String type = JamendoContract.CONTENT_TYPE_M3U;
+        Uri data = JamendoContract.createRadioUri("*", 0L);
         intent.setDataAndType(data, type);
         return isIntentSupported(context, intent);
     }

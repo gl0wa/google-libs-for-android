@@ -19,16 +19,18 @@ package com.google.android.demos.jamendo.widget;
 import com.google.android.demos.jamendo.R;
 import com.google.android.demos.jamendo.provider.JamendoContract.Albums;
 import com.google.android.demos.jamendo.provider.JamendoContract.Artists;
+import com.google.android.imageloader.ImageLoader;
 
-import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
+import android.support.v4.widget.CursorAdapter;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.TextView;
 
-public class AlbumGalleryAdapter extends JamendoGalleryAdapter implements
+public class AlbumGalleryAdapter extends CursorAdapter implements
         AdapterView.OnItemSelectedListener {
 
     public static final String[] PROJECTION = {
@@ -43,17 +45,17 @@ public class AlbumGalleryAdapter extends JamendoGalleryAdapter implements
 
     private static final int COLUMN_ALBUM_GENRE = 4;
 
-    private final TextView mTextAlbumName;
+    private final ImageLoader mImageLoader;
 
-    private final TextView mTextArtistName;
+    public AlbumGalleryAdapter(Context context) {
+        super(context, null, 0);
+        mImageLoader = ImageLoader.get(context);
+    }
 
-    private final TextView mTextAlbumGenre;
-
-    public AlbumGalleryAdapter(Activity context, int queryId) {
-        super(context, queryId);
-        mTextAlbumName = (TextView) context.findViewById(R.id.text1);
-        mTextArtistName = (TextView) context.findViewById(R.id.text2);
-        mTextAlbumGenre = (TextView) context.findViewById(R.id.text3);
+    @Override
+    public View newView(Context context, Cursor cursor, ViewGroup parent) {
+        LayoutInflater inflater = LayoutInflater.from(context);
+        return inflater.inflate(R.layout.jamendo_gallery_item, parent, false);
     }
 
     @Override
@@ -67,7 +69,6 @@ public class AlbumGalleryAdapter extends JamendoGalleryAdapter implements
      * {@inheritDoc}
      */
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        setAlbumDetails(position);
         mImageLoader.preload(getCursor(), COLUMN_ALBUM_IMAGE, position - 5, position + 5);
     }
 
@@ -75,37 +76,35 @@ public class AlbumGalleryAdapter extends JamendoGalleryAdapter implements
      * {@inheritDoc}
      */
     public void onNothingSelected(AdapterView<?> parent) {
-        clearAlbumDetails();
     }
 
     @Override
     public void notifyDataSetChanged() {
         super.notifyDataSetChanged();
-        int position = mGallery.getSelectedItemPosition();
-        setAlbumDetails(position);
 
         // Pre-fetch album covers
         Cursor cursor = getCursor();
         mImageLoader.prefetch(cursor, COLUMN_ALBUM_IMAGE);
     }
 
-    private void setAlbumDetails(int position) {
+    private String getString(Object item, int columnIndex) {
         Cursor cursor = getCursor();
-        if (cursor.moveToPosition(position)) {
-            String albumName = cursor.getString(COLUMN_ALBUM_NAME);
-            String artistName = cursor.getString(COLUMN_ARTIST_NAME);
-            String albumGenre = cursor.getString(COLUMN_ALBUM_GENRE);
-            mTextAlbumName.setText(albumName);
-            mTextArtistName.setText(artistName);
-            mTextAlbumGenre.setText(albumGenre);
+        if (item == cursor) {
+            return cursor.getString(columnIndex);
         } else {
-            clearAlbumDetails();
+            return null;
         }
     }
 
-    private void clearAlbumDetails() {
-        mTextAlbumName.setText("");
-        mTextArtistName.setText("");
-        mTextAlbumGenre.setText("");
+    public String getArtistName(Object item) {
+        return getString(item, COLUMN_ARTIST_NAME);
+    }
+
+    public String getAlbumName(Object item) {
+        return getString(item, COLUMN_ALBUM_NAME);
+    }
+
+    public String getAlbumGenre(Object item) {
+        return getString(item, COLUMN_ALBUM_GENRE);
     }
 }

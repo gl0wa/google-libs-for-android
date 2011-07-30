@@ -18,40 +18,51 @@ package com.google.android.demos.jamendo.app;
 
 import com.google.android.demos.jamendo.R;
 import com.google.android.demos.jamendo.widget.CompositeListAdapter;
-import com.google.android.demos.jamendo.widget.AdapterStateObserver;
-import com.google.android.feeds.widget.AdapterState;
-import com.google.android.feeds.widget.BaseFeedAdapter;
+import com.google.android.demos.jamendo.widget.StatusViewManager;
+import com.google.android.demos.jamendo.widget.Loadable;
 import com.google.android.imageloader.ImageLoader;
 
-import android.app.ListActivity;
-import android.content.Intent;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
+import android.support.v4.widget.CursorAdapter;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.ListAdapter;
+import android.widget.ListView;
 
-public abstract class JamendoActivity extends ListActivity {
+public abstract class JamendoActivity extends FragmentActivity implements
+        AdapterView.OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor>,
+        View.OnClickListener {
 
-    protected static final int QUERY_HEADER = 1;
+    protected static final int LOADER_HEADER = 1;
 
-    protected static final int QUERY_LIST = 2;
+    protected static final int LOADER_LIST = 2;
 
     protected ImageLoader mImageLoader;
+    
+    protected Loadable mHeader;
+    
+    protected Loadable mList;
 
-    protected BaseFeedAdapter mHeaderAdapter;
+    protected CursorAdapter mHeaderAdapter;
 
     protected ListAdapter mSeparatorAdapter;
 
-    protected BaseFeedAdapter mListAdapter;
+    protected CursorAdapter mListAdapter;
 
-    private AdapterState mListState;
-
-    protected abstract BaseFeedAdapter createHeaderAdapter();
+    protected abstract CursorAdapter createHeaderAdapter();
 
     protected abstract ListAdapter createSeparatorAdapter();
 
-    protected abstract BaseFeedAdapter createListAdapter();
-
-    protected abstract void changeIntent(Intent intent);
+    protected abstract CursorAdapter createListAdapter();
 
     protected final String getDimensionPixelSizeAsString(int resId) {
         Resources resources = getResources();
@@ -63,55 +74,81 @@ public abstract class JamendoActivity extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.jamendo_list);
 
         mImageLoader = ImageLoader.get(this);
         mHeaderAdapter = createHeaderAdapter();
         mSeparatorAdapter = createSeparatorAdapter();
         mListAdapter = createListAdapter();
-        ListAdapter listAdapter = new CompositeListAdapter(mHeaderAdapter, mSeparatorAdapter, mListAdapter);
-        setListAdapter(listAdapter);
-
-        AdapterStateObserver observer = new AdapterStateObserver();
-        observer.setActivity(this);
-        observer.setAdapters(mHeaderAdapter, mListAdapter);
         
-        mListState = new AdapterState();
-        mListState.setAdapterView(getListView());
-        mListState.setAdapter(getListAdapter());
+        LoaderManager.LoaderCallbacks<Cursor> callbacks = new StatusViewManager(this, LOADER_LIST, this, this);
+        mHeader = new Loadable(getSupportLoaderManager(), LOADER_HEADER, callbacks);
+        mList = new Loadable(getSupportLoaderManager(), LOADER_LIST, callbacks);
+        
+        ListView list = (ListView) findViewById(android.R.id.list);
+        list.setAdapter(new CompositeListAdapter(mHeaderAdapter, mSeparatorAdapter, mListAdapter));
+        list.setOnItemClickListener(this);
 
-        if (savedInstanceState == null) {
-            changeIntent(getIntent());
+        // Load up to 100 list items initially instead of loading incrementally
+        mHeader.init();
+        mList.init(100);
+    }
+
+    /** {@inheritDoc} */
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        switch (loader.getId()) {
+            case LOADER_HEADER:
+                mHeaderAdapter.swapCursor(data);
+                break;
+            case LOADER_LIST:
+                mListAdapter.swapCursor(data);
+                break;
         }
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mHeaderAdapter.onSaveInstanceState(outState);
-        mListAdapter.onSaveInstanceState(outState);
-        mListState.onSaveInstanceState(outState);
+    /** {@inheritDoc} */
+    public void onLoaderReset(Loader<Cursor> loader) {
+        switch (loader.getId()) {
+            case LOADER_HEADER:
+                mHeaderAdapter.swapCursor(null);
+                break;
+            case LOADER_LIST:
+                mListAdapter.swapCursor(null);
+                break;
+        }
+    }
+    
+    /** {@inheritDoc} */
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.retry:
+                mHeader.retry();
+                mList.retry();
+                break;
+        }
+    }
+
+    public final void refresh() {
+        mHeader.refresh();
+        mList.refresh();
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle state) {
-        super.onRestoreInstanceState(state);
-        mHeaderAdapter.onRestoreInstanceState(state);
-        mListAdapter.onRestoreInstanceState(state);
-        mListState.onRestoreInstanceState(state);
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.list_options_menu, menu);
+        return true;
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        mHeaderAdapter.onResume();
-        mListAdapter.onResume();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mHeaderAdapter.onStop();
-        mListAdapter.onStop();
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_refresh:
+                refresh();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

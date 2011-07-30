@@ -17,6 +17,7 @@
 package com.google.android.demos.jamendo.app;
 
 import com.google.android.demos.jamendo.R;
+import com.google.android.demos.jamendo.provider.JamendoContract;
 
 import android.app.ListActivity;
 import android.content.Context;
@@ -32,6 +33,9 @@ import android.widget.ListView;
 // TODO: Add "Top radios"
 public class RadioListActivity extends ListActivity {
 
+    // The XML array values are M3U playlist URLs
+    public static final String FORMAT = JamendoContract.FORMAT_M3U;
+    
     private String[] mArrayName;
     private String[] mArrayUri;
     private String[] mArrayType;

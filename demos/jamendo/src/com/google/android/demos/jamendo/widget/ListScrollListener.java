@@ -16,8 +16,6 @@
 
 package com.google.android.demos.jamendo.widget;
 
-import com.google.android.feeds.widget.FeedAdapter;
-
 import android.widget.AbsListView;
 import android.widget.ListView;
 
@@ -25,12 +23,12 @@ import android.widget.ListView;
  * Automatically loads more items when the user scrolls to the bottom of a
  * {@link ListView}.
  */
-public class ListScrollListener implements AbsListView.OnScrollListener {
+public final class ListScrollListener implements AbsListView.OnScrollListener {
 
-    private final FeedAdapter mAdapter;
+    private final Loadable mLoadable;
 
-    public ListScrollListener(FeedAdapter adapter) {
-        mAdapter = adapter;
+    public ListScrollListener(Loadable loadable) {
+        mLoadable = loadable;
     }
 
     /**
@@ -39,8 +37,8 @@ public class ListScrollListener implements AbsListView.OnScrollListener {
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
             int totalItemCount) {
         if (firstVisibleItem >= totalItemCount - visibleItemCount) {
-            if (mAdapter.isReadyToLoadMore()) {
-                mAdapter.loadMore(visibleItemCount);
+            if (mLoadable.isReadyToLoadMore()) {
+                mLoadable.loadMore();
             }
         }
     }

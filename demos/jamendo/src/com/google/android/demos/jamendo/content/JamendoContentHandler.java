@@ -18,8 +18,8 @@ package com.google.android.demos.jamendo.content;
 
 import com.google.android.demos.jamendo.R;
 import com.google.android.demos.jamendo.provider.JamendoContract.Albums;
-import com.google.android.feeds.content.FeedLoader;
-import com.google.android.feeds.net.XmlContentHandler;
+import com.google.android.feeds.FeedLoader;
+import com.google.android.feeds.XmlContentHandler;
 
 import org.xml.sax.Attributes;
 

@@ -22,26 +22,30 @@ import com.google.android.demos.jamendo.provider.JamendoContract.Artists;
 import com.google.android.demos.jamendo.provider.JamendoContract.Tags;
 import com.google.android.demos.jamendo.widget.ListSeparatorAdapter;
 import com.google.android.demos.jamendo.widget.SimpleFeedAdapter;
-import com.google.android.feeds.widget.BaseFeedAdapter;
 
 import android.content.ContentUris;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
+import android.os.Bundle;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v4.widget.CursorAdapter;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListAdapter;
-import android.widget.ListView;
 
 public class TagActivity extends JamendoActivity {
 
     @Override
-    protected BaseFeedAdapter createHeaderAdapter() {
+    protected CursorAdapter createHeaderAdapter() {
         String[] from = {
                 Tags._ID, Tags.NAME
         };
         int[] to = {
                 android.R.id.icon, android.R.id.text1
         };
-        return new SimpleFeedAdapter(this, QUERY_HEADER, R.layout.jamendo_tag_header, from, to);
+        return new SimpleFeedAdapter(this, R.layout.jamendo_tag_header, from, to);
     }
 
     @Override
@@ -50,49 +54,49 @@ public class TagActivity extends JamendoActivity {
     }
 
     @Override
-    protected BaseFeedAdapter createListAdapter() {
+    protected CursorAdapter createListAdapter() {
         String[] from = {
                 Albums.IMAGE, Artists.NAME, Albums.NAME, Albums.GENRE
         };
         int[] to = {
                 R.id.icon, R.id.text1, R.id.text2, R.id.text3
         };
-        return new SimpleFeedAdapter(this, QUERY_LIST, R.layout.jamendo_list_item_3, from, to);
+        return new SimpleFeedAdapter(this, R.layout.jamendo_list_item_3, from, to);
+    }
+    
+    /** {@inheritDoc} */
+    public Loader<Cursor> onCreateLoader(int loaderId, Bundle args) {
+        switch (loaderId) {
+            case LOADER_HEADER: {
+                Uri uri = getIntent().getData();
+                String[] projection = {
+                        Tags._ID, Tags.IDSTR, Tags.NAME
+                };
+                String selection = null;
+                String[] selectionArgs = null;
+                String sortOrder = null;
+                return new CursorLoader(this, uri, projection, selection, selectionArgs, sortOrder);
+            }
+            case LOADER_LIST: {
+                String idstr = getIntent().getData().getLastPathSegment();
+                Uri uri = Albums.CONTENT_URI;
+                String[] projection = {
+                        Albums._ID, Albums.IMAGE, Artists.NAME, Albums.NAME, Albums.GENRE
+                };
+                String selection = String.format("%s=?", Tags.IDSTR);
+                String[] selectionArgs = {
+                    idstr
+                };
+                String sortOrder = Albums.Order.RATINGMONTH.descending();
+                return new CursorLoader(this, uri, projection, selection, selectionArgs, sortOrder);
+            }
+            default:
+                return null;
+        }
     }
 
-    @Override
-    protected void changeIntent(Intent intent) {
-        changeHeaderAdapterQuery(intent);
-        changeListAdapterQuery(intent);
-    }
-
-    private void changeHeaderAdapterQuery(Intent intent) {
-        Uri uri = intent.getData();
-        String[] projection = {
-                Tags._ID, Tags.IDSTR, Tags.NAME
-        };
-        String selection = null;
-        String[] selectionArgs = null;
-        String sortOrder = null;
-        mHeaderAdapter.changeQuery(uri, projection, selection, selectionArgs, sortOrder);
-    }
-
-    private void changeListAdapterQuery(Intent intent) {
-        String idstr = intent.getData().getLastPathSegment();
-        Uri uri = Albums.CONTENT_URI;
-        String[] projection = {
-                Albums._ID, Albums.IMAGE, Artists.NAME, Albums.NAME, Albums.GENRE
-        };
-        String selection = String.format("%s=?", Tags.IDSTR);
-        String[] selectionArgs = {
-            idstr
-        };
-        String sortOrder = Albums.Order.RATINGMONTH.descending();
-        mListAdapter.changeQuery(uri, projection, selection, selectionArgs, sortOrder);
-    }
-
-    @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
+    /** {@inheritDoc} */
+    public void onItemClick(AdapterView<?> l, View v, int position, long id) {
         Uri uri = ContentUris.withAppendedId(Albums.CONTENT_URI, id);
         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
         startActivity(intent);

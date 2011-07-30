@@ -26,6 +26,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,7 +36,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class TrackListAdapter extends JamendoFeedAdapter {
+public class TrackListAdapter extends CursorAdapter {
 
     static final String LOG_TAG = "TrackListAdapter";
 
@@ -47,8 +48,8 @@ public class TrackListAdapter extends JamendoFeedAdapter {
 
     private final Date mDate;
 
-    public TrackListAdapter(Activity context, int queryId) {
-        super(context, queryId);
+    public TrackListAdapter(Activity context) {
+        super(context, null, 0);
         mFormat = new SimpleDateFormat("m:ss");
         mDate = new Date();
     }

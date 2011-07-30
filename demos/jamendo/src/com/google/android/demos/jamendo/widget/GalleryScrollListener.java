@@ -16,35 +16,37 @@
 
 package com.google.android.demos.jamendo.widget;
 
-import com.google.android.feeds.widget.FeedAdapter;
-
 import android.view.View;
+import android.widget.Adapter;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
 
-public class GalleryScrollListener implements OnItemSelectedListener {
+public final class GalleryScrollListener implements AdapterView.OnItemSelectedListener {
 
-    private final FeedAdapter mAdapter;
+    private final Loadable mLoadable;
 
-    public GalleryScrollListener(FeedAdapter adapter) {
-        mAdapter = adapter;
+    public GalleryScrollListener(Loadable loadable) {
+        mLoadable = loadable;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    private static int getCount(AdapterView<?> gallery) {
+        // Don't use AdapterView#getCount() because it is updated asynchronously
+        Adapter adapter = gallery.getAdapter();
+        return adapter != null ? adapter.getCount() : 0;
+    }
+
+    private boolean isNearEnd(AdapterView<?> parent, int position) {
+        return (getCount(parent) - position) < Loadable.PAGE_SIZE;
+    }
+
+    /** {@inheritDoc} */
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        int count = mAdapter.getCount();
-        if (position > count - 10) {
-            if (mAdapter.isReadyToLoadMore()) {
-                mAdapter.loadMore(20);
-            }
+        if (isNearEnd(parent, position) && mLoadable.isReadyToLoadMore()) {
+            mLoadable.loadMore();
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void onNothingSelected(AdapterView<?> parent) {
     }
+
 }

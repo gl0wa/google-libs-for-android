@@ -24,19 +24,22 @@ import com.google.android.demos.jamendo.provider.JamendoContract.Tracks;
 import com.google.android.demos.jamendo.widget.AlbumHeaderAdapter;
 import com.google.android.demos.jamendo.widget.ListSeparatorAdapter;
 import com.google.android.demos.jamendo.widget.TrackListAdapter;
-import com.google.android.feeds.widget.BaseFeedAdapter;
 
 import android.content.ComponentName;
 import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Bundle;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v4.widget.CursorAdapter;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListAdapter;
-import android.widget.ListView;
 
 import java.text.MessageFormat;
 
@@ -47,8 +50,8 @@ public class AlbumActivity extends JamendoActivity {
     private static final int MENU_GROUP_INTENT_OPTIONS = Menu.FIRST;
 
     @Override
-    protected BaseFeedAdapter createHeaderAdapter() {
-        return new AlbumHeaderAdapter(this, QUERY_HEADER);
+    protected CursorAdapter createHeaderAdapter() {
+        return new AlbumHeaderAdapter(this);
     }
 
     @Override
@@ -57,51 +60,52 @@ public class AlbumActivity extends JamendoActivity {
     }
 
     @Override
-    protected BaseFeedAdapter createListAdapter() {
-        return new TrackListAdapter(this, QUERY_LIST);
+    protected CursorAdapter createListAdapter() {
+        return new TrackListAdapter(this);
     }
 
-    @Override
-    protected void changeIntent(Intent intent) {
-        changeHeaderAdapterQuery(intent);
-        changeListAdapterQuery(intent);
-    }
+    /** {@inheritDoc} */
+    public Loader<Cursor> onCreateLoader(int loaderId, Bundle args) {
+        switch (loaderId) {
+            case LOADER_HEADER: {
+                Uri uri = getIntent().getData();
+                String[] projection = {
+                        Albums._ID, Albums.ID, Albums.IMAGE, Albums.NAME, Artists.NAME, Artists.ID,
+                        Albums.GENRE
+                };
+                String selection = String.format("%s=?", JamendoContract.PARAM_IMAGE_SIZE);
+                String[] selectionArgs = {
+                    getDimensionPixelSizeAsString(R.dimen.image_size)
+                };
+                String sortOrder = null;
+                return new CursorLoader(this, uri, projection, selection, selectionArgs, sortOrder);
+            }
+            case LOADER_LIST: {
+                Uri uri = Tracks.CONTENT_URI;
+                String[] projection = TrackListAdapter.PROJECTION;
 
-    private void changeHeaderAdapterQuery(Intent intent) {
-        Uri uri = intent.getData();
-        String[] projection = {
-                Albums._ID, Albums.ID, Albums.IMAGE, Albums.NAME, Artists.NAME, Artists.ID,
-                Albums.GENRE
-        };
-        String selection = String.format("%s=?", JamendoContract.PARAM_IMAGE_SIZE);
-        String[] selectionArgs = {
-            getDimensionPixelSizeAsString(R.dimen.image_size)
-        };
-        String sortOrder = null;
-        mHeaderAdapter.changeQuery(uri, projection, selection, selectionArgs, sortOrder);
-    }
+                // Join the track query to the artist table so that the artist is known
+                // even if the album cursor fails.
+                String selection = String.format("%s=?&%s=?&%s=?", JamendoContract.PARAM_JOIN,
+                        JamendoContract.PARAM_JOIN, Albums.ID);
 
-    private void changeListAdapterQuery(Intent intent) {
-        Uri uri = Tracks.CONTENT_URI;
-        String[] projection = TrackListAdapter.PROJECTION;
-
-        // Join the track query to the artist table so that the artist is known
-        // even if the album cursor fails.
-        String selection = String.format("%s=?&%s=?&%s=?", JamendoContract.PARAM_JOIN,
-                JamendoContract.PARAM_JOIN, Albums.ID);
-
-        Uri albumUri = intent.getData();
-        long albumId = ContentUris.parseId(albumUri);
-        String[] selectionArgs = {
-                JamendoContract.JOIN_TRACK_ALBUM, JamendoContract.JOIN_ALBUM_ARTIST,
-                String.valueOf(albumId)
-        };
-        String sortOrder = Tracks.Order.NUMALBUM.ascending();
-        mListAdapter.changeQuery(uri, projection, selection, selectionArgs, sortOrder);
+                Uri albumUri = getIntent().getData();
+                long albumId = ContentUris.parseId(albumUri);
+                String[] selectionArgs = {
+                        JamendoContract.JOIN_TRACK_ALBUM, JamendoContract.JOIN_ALBUM_ARTIST,
+                        String.valueOf(albumId)
+                };
+                String sortOrder = Tracks.Order.NUMALBUM.ascending();
+                return new CursorLoader(this, uri, projection, selection, selectionArgs, sortOrder);
+            }
+            default:
+                return null;
+        }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.album_options_menu, menu);
         return true;
@@ -109,7 +113,7 @@ public class AlbumActivity extends JamendoActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        boolean display = super.onPrepareOptionsMenu(menu);
+        super.onPrepareOptionsMenu(menu);
         int groupId = MENU_GROUP_INTENT_OPTIONS;
         int itemId = Menu.NONE;
         int order = Menu.NONE;
@@ -123,10 +127,9 @@ public class AlbumActivity extends JamendoActivity {
         intent.addCategory(Intent.CATEGORY_ALTERNATIVE);
         int flags = 0;
         MenuItem[] outSpecificItems = null;
-        int alternatives = menu.addIntentOptions(groupId, itemId, order, caller, specifics, intent,
-                flags, outSpecificItems);
-        display |= alternatives != 0;
-        return display;
+        menu.addIntentOptions(groupId, itemId, order, caller, specifics, intent, flags,
+                outSpecificItems);
+        return menu.hasVisibleItems();
     }
 
     @Override
@@ -141,7 +144,7 @@ public class AlbumActivity extends JamendoActivity {
     }
 
     private void share() {
-        long id = ContentUris.parseId(mHeaderAdapter.getUri());
+        long id = ContentUris.parseId(getIntent().getData());
         Uri uri = ContentUris.withAppendedId(BASE_URI, id);
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
@@ -158,8 +161,8 @@ public class AlbumActivity extends JamendoActivity {
         startActivity(intent);
     }
 
-    @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
+    /** {@inheritDoc} */
+    public void onItemClick(AdapterView<?> l, View v, int position, long id) {
         TrackListAdapter.playTrack(this, id);
     }
 }

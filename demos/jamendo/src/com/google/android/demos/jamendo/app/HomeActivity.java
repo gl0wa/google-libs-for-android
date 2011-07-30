@@ -78,7 +78,7 @@ public class HomeActivity extends ListActivity implements AccountManagerCallback
 
         ListView listView = getListView();
         listView.addHeaderView(mAccountView, null, true);
-        if (JamendoApp.isPlaylistStreamingSupported(context)) {
+        if (JamendoApp.isPlaylistStreamingSupported(context, RadioListActivity.FORMAT)) {
             listView.addHeaderView(mRadioView, null, true);
         }
 

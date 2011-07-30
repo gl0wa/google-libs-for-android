@@ -37,8 +37,8 @@ public class PlaylistHeaderAdapter extends TrackListHeaderAdapter {
             R.id.icon, R.id.text1, R.id.text2, R.id.link1, R.id.link2
     };
 
-    public PlaylistHeaderAdapter(Activity context, int queryId) {
-        super(context, queryId, R.layout.jamendo_header, FROM, TO);
+    public PlaylistHeaderAdapter(Activity context) {
+        super(context, R.layout.jamendo_header, FROM, TO);
         setDefaultImageUrl(JamendoApp.DEFAULT_USER_AVATAR_100);
     }
 

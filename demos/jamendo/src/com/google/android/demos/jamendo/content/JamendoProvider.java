@@ -26,9 +26,8 @@ import com.google.android.demos.jamendo.provider.JamendoContract.Reviews;
 import com.google.android.demos.jamendo.provider.JamendoContract.Tags;
 import com.google.android.demos.jamendo.provider.JamendoContract.Tracks;
 import com.google.android.demos.jamendo.provider.JamendoContract.Users;
-import com.google.android.feeds.content.FeedLoader;
-import com.google.android.feeds.content.FeedProvider;
-import com.google.android.feeds.provider.FeedUri;
+import com.google.android.feeds.FeedLoader;
+import com.google.android.feeds.FeedProvider;
 
 import android.app.SearchManager;
 import android.content.ContentProvider;
@@ -55,7 +54,9 @@ public class JamendoProvider extends ContentProvider {
 
     private static final Uri BASE_URI = Uri.parse("http://api.jamendo.com/get2/");
 
-    private static final int PAGE_SIZE = 20;
+    private static final int PAGE_SIZE = 10;
+
+    private static final long DEFAULT_MAX_AGE = DateUtils.DAY_IN_MILLIS;
 
     private static final UriMatcher sUriMatcher;
 
@@ -368,19 +369,18 @@ public class JamendoProvider extends ContentProvider {
 
             ContentHandler handler = new JamendoContentHandler(output, table, projectionMap);
 
-            long defaultMaxAge = DateUtils.DAY_IN_MILLIS;
-            Long maxAge = Long.valueOf(JamendoContract.getMaxAge(uri, defaultMaxAge));
+            Long maxAge = Long.valueOf(JamendoContract.getMaxAge(uri, DEFAULT_MAX_AGE));
             handler = JamendoCache.capture(handler, maxAge);
 
             Uri feedUri = builder.build();
             String queryParam = "pn";
             int firstPage = 1;
-            int n = FeedUri.getItemCount(uri, PAGE_SIZE);
+            int n = JamendoContract.getNumber(uri, PAGE_SIZE);
             FeedLoader.loadPagedFeed(handler, feedUri, queryParam, firstPage, PAGE_SIZE, n, extras);
             return FeedProvider.feedCursor(output, extras);
         } catch (Throwable t) {
             Log.e(TAG, "query failed", t);
-            return FeedProvider.errorCursor(output, extras, t);
+            return FeedProvider.errorCursor(output, extras, t, null);
         }
     }
 

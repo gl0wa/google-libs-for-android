@@ -21,6 +21,7 @@ import com.google.android.imageloader.ImageLoader;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
+import android.support.v4.widget.CursorAdapter;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,7 +29,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class SimpleFeedAdapter extends JamendoFeedAdapter {
+public class SimpleFeedAdapter extends CursorAdapter {
 
     private final int mLayout;
 
@@ -40,8 +41,8 @@ public class SimpleFeedAdapter extends JamendoFeedAdapter {
 
     private String mDefaultImageUrl;
 
-    public SimpleFeedAdapter(Activity context, int queryId, int layout, String[] from, int[] to) {
-        super(context, queryId);
+    public SimpleFeedAdapter(Activity context, int layout, String[] from, int[] to) {
+        super(context, null, 0);
         mLayout = layout;
         mFrom = from;
         mTo = to;

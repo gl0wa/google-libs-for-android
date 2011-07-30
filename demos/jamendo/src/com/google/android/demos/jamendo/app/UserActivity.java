@@ -23,14 +23,18 @@ import com.google.android.demos.jamendo.provider.JamendoContract.Artists;
 import com.google.android.demos.jamendo.provider.JamendoContract.Users;
 import com.google.android.demos.jamendo.widget.ListSeparatorAdapter;
 import com.google.android.demos.jamendo.widget.SimpleFeedAdapter;
-import com.google.android.feeds.widget.BaseFeedAdapter;
 
 import android.content.ContentUris;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
+import android.os.Bundle;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v4.widget.CursorAdapter;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListAdapter;
-import android.widget.ListView;
 
 public class UserActivity extends JamendoActivity {
 
@@ -43,15 +47,15 @@ public class UserActivity extends JamendoActivity {
     }
 
     @Override
-    protected BaseFeedAdapter createHeaderAdapter() {
+    protected CursorAdapter createHeaderAdapter() {
         String[] from = {
                 Users.IMAGE, Users.NAME, Users.LANG
         };
         int[] to = {
                 R.id.icon, R.id.text1, R.id.text2
         };
-        SimpleFeedAdapter adapter = new SimpleFeedAdapter(this, QUERY_HEADER,
-                R.layout.jamendo_header, from, to);
+        SimpleFeedAdapter adapter = new SimpleFeedAdapter(this, R.layout.jamendo_header, from,
+                to);
         adapter.setDefaultImageUrl(JamendoApp.DEFAULT_USER_AVATAR_100);
         return adapter;
     }
@@ -62,54 +66,54 @@ public class UserActivity extends JamendoActivity {
     }
 
     @Override
-    protected BaseFeedAdapter createListAdapter() {
+    protected CursorAdapter createListAdapter() {
         String[] from = {
                 Albums.IMAGE, Artists.NAME, Albums.NAME
         };
         int[] to = {
                 R.id.icon, R.id.text1, R.id.text2
         };
-        return new SimpleFeedAdapter(this, QUERY_LIST, R.layout.jamendo_list_item_2, from, to);
+        return new SimpleFeedAdapter(this, R.layout.jamendo_list_item_2, from, to);
+    }
+    
+    /** {@inheritDoc} */
+    public Loader<Cursor> onCreateLoader(int loaderId, Bundle args) {
+        switch (loaderId) {
+            case LOADER_HEADER: {
+                Uri uri = getIntent().getData();
+                String[] projection = {
+                        Users._ID, Users.IMAGE, Users.NAME, Users.LANG
+                };
+                String selection = String.format("%s=?", JamendoContract.PARAM_IMAGE_SIZE);
+                String[] selectionArgs = {
+                    getDimensionPixelSizeAsString(R.dimen.avatar_size)
+                };
+                String sortOrder = null;
+                return new CursorLoader(this, uri, projection, selection, selectionArgs, sortOrder);
+            }
+            case LOADER_LIST: {
+                Uri data = getIntent().getData();
+                String id = data.getLastPathSegment();
+                Uri uri = Albums.CONTENT_URI;
+                String[] projection = {
+                        Albums._ID, Albums.IMAGE, Artists.NAME, Albums.NAME
+                };
+                String selection = String.format("%s=?&%s=?&%s=?", getColumnNameForId(id),
+                        JamendoContract.PARAM_JOIN, JamendoContract.PARAM_IMAGE_SIZE);
+                String[] selectionArgs = {
+                        id, JamendoContract.JOIN_ALBUM_USER_STARRED,
+                        getDimensionPixelSizeAsString(R.dimen.image_size)
+                };
+                String sortOrder = Albums.Order.STARREDDATE.descending();
+                return new CursorLoader(this, uri, projection, selection, selectionArgs, sortOrder);
+            }
+            default:
+                return null;
+        }
     }
 
-    @Override
-    protected void changeIntent(Intent intent) {
-        changeHeaderAdapterQuery(intent);
-        changeListAdapterQuery(intent);
-    }
-
-    private void changeHeaderAdapterQuery(Intent intent) {
-        Uri uri = intent.getData();
-        String[] projection = {
-                Users._ID, Users.IMAGE, Users.NAME, Users.LANG
-        };
-        String selection = String.format("%s=?", JamendoContract.PARAM_IMAGE_SIZE);
-        String[] selectionArgs = {
-            getDimensionPixelSizeAsString(R.dimen.avatar_size)
-        };
-        String sortOrder = null;
-        mHeaderAdapter.changeQuery(uri, projection, selection, selectionArgs, sortOrder);
-    }
-
-    private void changeListAdapterQuery(Intent intent) {
-        Uri data = intent.getData();
-        String id = data.getLastPathSegment();
-        Uri uri = Albums.CONTENT_URI;
-        String[] projection = {
-                Albums._ID, Albums.IMAGE, Artists.NAME, Albums.NAME
-        };
-        String selection = String.format("%s=?&%s=?&%s=?", getColumnNameForId(id),
-                JamendoContract.PARAM_JOIN, JamendoContract.PARAM_IMAGE_SIZE);
-        String[] selectionArgs = {
-                id, JamendoContract.JOIN_ALBUM_USER_STARRED,
-                getDimensionPixelSizeAsString(R.dimen.image_size)
-        };
-        String sortOrder = Albums.Order.STARREDDATE.descending();
-        mListAdapter.changeQuery(uri, projection, selection, selectionArgs, sortOrder);
-    }
-
-    @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
+    /** {@inheritDoc} */
+    public void onItemClick(AdapterView<?> l, View v, int position, long id) {
         Uri uri = ContentUris.withAppendedId(Albums.CONTENT_URI, id);
         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
         startActivity(intent);
