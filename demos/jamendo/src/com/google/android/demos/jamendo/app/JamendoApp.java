@@ -44,10 +44,6 @@ public class JamendoApp extends Application {
 
     private static final int IMAGE_TASK_LIMIT = 3;
 
-    // 50% of available memory, up to a maximum of 32MB
-    private static final long IMAGE_CACHE_SIZE = Math.min(Runtime.getRuntime().maxMemory() / 2,
-            32 * 1024 * 1024);
-
     public static final String DEFAULT_ARTIST_AVATAR = "http://imgjam.com/mandarine/layout/artiste_avatar.jpg";
 
     public static final String DEFAULT_USER_AVATAR_50 = "http://imgjam.com/avatars/questionmark/avatar.50.gif";
@@ -129,7 +125,7 @@ public class JamendoApp extends Application {
         Handler handler = null;
         
         return new ImageLoader(IMAGE_TASK_LIMIT, streamFactory, bitmapHandler, prefetchHandler,
-                IMAGE_CACHE_SIZE, handler);
+                ImageLoader.DEFAULT_CACHE_SIZE, handler);
     }
 
     private static class IntentSpan extends ClickableSpan {
