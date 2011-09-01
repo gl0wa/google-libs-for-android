@@ -45,7 +45,7 @@ public class JamendoApp extends Application {
     private static final int IMAGE_TASK_LIMIT = 3;
 
     // 50% of available memory, up to a maximum of 32MB
-    private static final long IMAGE_CACHE_SIZE = Math.max(Runtime.getRuntime().maxMemory() / 2,
+    private static final long IMAGE_CACHE_SIZE = Math.min(Runtime.getRuntime().maxMemory() / 2,
             32 * 1024 * 1024);
 
     public static final String DEFAULT_ARTIST_AVATAR = "http://imgjam.com/mandarine/layout/artiste_avatar.jpg";
