@@ -37,6 +37,9 @@ import android.os.Message;
 import android.os.Process;
 import android.util.Log;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 /**
  * Abstract base class for services that invoke
  * {@link AbstractSyncAdapter#onPerformSync(Account, Bundle, String)}.
@@ -206,23 +209,16 @@ public abstract class AbstractSyncService extends IntentService {
         // Prevent the system from killing the process while a notification is
         // shown, otherwise the notification will remain visible if the service
         // is killed in the middle of a sync operation.
-        setForeground(true);
+        startForegroundCompat(mNotificationId, createNotification(authority));
         try {
-            showNotification(authority);
-            try {
-                AbstractSyncAdapter syncAdapter = createSyncAdapter();
-                syncAdapter.onPerformSync(account, extras, authority);
-            } finally {
-                cancelNotification();
-            }
+            AbstractSyncAdapter syncAdapter = createSyncAdapter();
+            syncAdapter.onPerformSync(account, extras, authority);
         } finally {
-            setForeground(false);
+            stopForegroundCompat(mNotificationId);
         }
     }
 
-    private void showNotification(String authority) {
-        Object service = getSystemService(NOTIFICATION_SERVICE);
-        NotificationManager notificationManager = (NotificationManager) service;
+    private Notification createNotification(String authority) {
         int icon = android.R.drawable.stat_notify_sync;
         String tickerText = null;
         long when = 0;
@@ -234,18 +230,12 @@ public abstract class AbstractSyncService extends IntentService {
         notification.when = System.currentTimeMillis();
         notification.flags |= Notification.FLAG_ONGOING_EVENT;
         notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
-        notificationManager.notify(mNotificationId, notification);
-    }
-
-    private void cancelNotification() {
-        Object service = getSystemService(NOTIFICATION_SERVICE);
-        NotificationManager nm = (NotificationManager) service;
-        nm.cancel(mNotificationId);
+        return notification;
     }
 
     @Override
     public void onDestroy() {
-        cancelNotification();
+        stopForegroundCompat(mNotificationId);
         super.onDestroy();
     }
 
@@ -290,7 +280,7 @@ class Adapter {
 }
 
 // A copy of android.app.IntentService with added thread priority parameter.
-abstract class IntentService extends Service {
+abstract class IntentService extends CompatService {
     private volatile Looper mServiceLooper;
 
     private volatile ServiceHandler mServiceHandler;
@@ -356,4 +346,73 @@ abstract class IntentService extends Service {
      * than the one that handles the {@link #onStart} call.
      */
     protected abstract void onHandleIntent(Intent intent);
+}
+
+
+// http://developer.android.com/reference/android/app/Service.html#startForeground(int, android.app.Notification)
+abstract class CompatService extends Service {
+
+    private NotificationManager mNotificationManager;
+
+    private Method mSetForeground;
+
+    private Method mStartForeground;
+
+    private Method mStopForeground;
+
+    @Override
+    public void onCreate() {
+        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        mStartForeground = getMethod("startForeground", int.class, Notification.class);
+        mStopForeground = getMethod("stopForeground", boolean.class);
+        mSetForeground = getMethod("setForeground", boolean.class);
+    }
+
+    /**
+     * This is a wrapper around {@link #startForeground(int, Notification)},
+     * using the older APIs if it is not available.
+     */
+    public void startForegroundCompat(int id, Notification notification) {
+        if (mStartForeground != null) {
+            invokeMethod(mStartForeground, Integer.valueOf(id), notification);
+        } else {
+            invokeMethod(mSetForeground, Boolean.TRUE);
+            mNotificationManager.notify(id, notification);
+        }
+    }
+
+    /**
+     * This is a wrapper around {@link #stopForeground(boolean)}, using the
+     * older APIs if it is not available.
+     */
+    public void stopForegroundCompat(int id) {
+        if (mStopForeground != null) {
+            Boolean removeNotification = Boolean.TRUE;
+            invokeMethod(mStopForeground, removeNotification);
+        } else {
+            mNotificationManager.cancel(id);
+            invokeMethod(mSetForeground, Boolean.FALSE);
+        }
+    }
+
+    private Method getMethod(String name, Class<?>... parameterTypes) {
+        try {
+            return Service.class.getMethod(name, parameterTypes);
+        } catch (SecurityException e) {
+            return null;
+        } catch (NoSuchMethodException e) {
+            return null;
+        }
+    }
+
+    private void invokeMethod(Method method, Object... args) {
+        try {
+            Object receiver = this;
+            method.invoke(receiver, args);
+        } catch (InvocationTargetException e) {
+            throw (Error) new AssertionError().initCause(e);
+        } catch (IllegalAccessException e) {
+            throw (Error) new AssertionError().initCause(e);
+        }
+    }
 }
