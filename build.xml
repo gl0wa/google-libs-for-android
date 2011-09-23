@@ -5,7 +5,7 @@
     <property name="src.dir" value="src" />
     <property name="build.dir" value="bin" />
     <property name="javadoc.dir" value="docs/api" />
-    <property name="platform" value="android-8" />
+    <property name="platform" value="android-11" />
     <property name="jar.dir" value="${build.dir}" />
     <target name="clean">
         <delete dir="${build.dir}" />
@@ -42,6 +42,23 @@
         <jar destfile="${jar.dir}/accounts.jar">
             <fileset dir="${build.dir}/classes/accounts" />
             <fileset dir="src" includes="com/google/android/accounts/*.java" />
+        </jar>
+    </target>
+    <target name="compile-callable">
+        <mkdir dir="${build.dir}/classes/callable" />
+        <javac includes="com/google/android/callable/**"
+               destdir="${build.dir}/classes/callable"
+               sourcepath=""
+               srcdir="src"
+               classpath="${sdk.dir}/platforms/${platform}/android.jar"
+               target="1.5"
+               debug="on" />
+    </target>
+    <target name="jar-callable" depends="compile-callable">
+        <mkdir dir="${jar.dir}" />
+        <jar destfile="${jar.dir}/callable.jar">
+            <fileset dir="${build.dir}/classes/callable" />
+            <fileset dir="src" includes="com/google/android/callable/*.java" />
         </jar>
     </target>
     <target name="compile-filecache">
@@ -102,6 +119,7 @@
                  destdir="${javadoc.dir}"
                  windowtitle="libs-for-android">
             <group title="Accounts" packages="com.google.android.accounts" />
+            <group title="Callable ContentProvider" packages="com.google.android.callable" />
             <group title="File Cache"
                    packages="com.google.android.filecache" />
             <group title="HTML Widget"

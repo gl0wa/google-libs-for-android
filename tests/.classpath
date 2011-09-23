@@ -8,5 +8,6 @@
 	<classpathentry kind="lib" path="libs/filecache.jar"/>
 	<classpathentry kind="lib" path="libs/htmlwidget.jar"/>
 	<classpathentry kind="lib" path="libs/imageloader.jar"/>
+	<classpathentry kind="lib" path="libs/callable.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
