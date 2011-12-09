@@ -1,25 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.google.android.feeds.tests"
-    android:versionCode="1"
-    android:versionName="1.0">
-    <application
-        android:debuggable="true">
-        <uses-library
-            android:name="android.test.runner" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.google.android.libs.test" >
+
+    <application android:debuggable="true" >
+        <uses-library android:name="android.test.runner" />
     </application>
     <!--
         Set the targetPackage to the test harness because it contains all the
         classes that need to be tested in the libs/ directory.
     -->
     <instrumentation
-        android:name="android.test.InstrumentationTestRunner"
-        android:targetPackage="com.google.android.feeds.tests"
-        android:label="Tests for libs-for-android" />
-    <uses-permission
-        android:name="android.permission.INTERNET" />
+        android:label="Tests for libs-for-android"
+        android:name=".TestRunner"
+        android:targetPackage="com.google.android.libs.test" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <uses-sdk
-        android:targetSdkVersion="6"
-        android:minSdkVersion="3" />
+        android:minSdkVersion="3"
+        android:targetSdkVersion="14" />
+
 </manifest>
