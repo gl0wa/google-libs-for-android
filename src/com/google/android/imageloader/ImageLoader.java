@@ -498,14 +498,17 @@ public final class ImageLoader {
      * {@link ImageView}, but a different URL.
      * <p>
      * Use {@link #bind(BaseAdapter, ImageView, String)} instead of this method
-     * when the {@link ImageView} is in an {@link android.widget.AdapterView} so that the image
-     * will be bound correctly in the case where it has been assigned to a
-     * different position since the asynchronous request was started.
+     * when the {@link ImageView} is in an {@link android.widget.AdapterView} so
+     * that the image will be bound correctly in the case where it has been
+     * assigned to a different position since the asynchronous request was
+     * started.
      *
      * @param view the {@link ImageView} to bind.
      * @param url the image URL.s
-     * @param callback invoked when there is an error loading the image. This
-     *            parameter can be {@code null} if a callback is not required.
+     * @param callback invoked after the image has finished loading or after an
+     *            error. The callback may be executed before this method returns
+     *            when the result is cached. This parameter can be {@code null}
+     *            if a callback is not required.
      * @return a {@link BindResult}.
      * @throws NullPointerException if a required argument is {@code null}
      */
@@ -521,6 +524,9 @@ public final class ImageLoader {
         ImageError error = getError(url);
         if (bitmap != null) {
             view.setImageBitmap(bitmap);
+            if (callback != null) {
+                callback.onImageLoaded(view, url);
+            }
             return BindResult.OK;
         } else {
             // Clear the ImageView by default.
@@ -529,6 +535,9 @@ public final class ImageLoader {
             view.setImageDrawable(null);
 
             if (error != null) {
+                if (callback != null) {
+                    callback.onImageError(view, url, error.getCause());
+                }
                 return BindResult.ERROR;
             } else {
                 ImageRequest request = new ImageRequest(view, url, callback);
@@ -835,9 +844,9 @@ public final class ImageLoader {
     }
 
     private final class ImageViewCallback implements ImageCallback {
-        
+
         // TODO: Use WeakReferences?
-        
+
         private final ImageView mImageView;
         private final Callback mCallback;
 
@@ -845,7 +854,7 @@ public final class ImageLoader {
             mImageView = imageView;
             mCallback = callback;
         }
-        
+
         /** {@inheritDoc} */
         public boolean unwanted() {
             // Always complete the callback
@@ -859,13 +868,6 @@ public final class ImageLoader {
                 // The ImageView has been unbound or bound to a
                 // different URL since the task was started.
                 return;
-            }
-            Context context = mImageView.getContext();
-            if (context instanceof Activity) {
-                Activity activity = (Activity) context;
-                if (activity.isFinishing()) {
-                    return;
-                }
             }
             if (bitmap != null) {
                 mImageView.setImageBitmap(bitmap);
@@ -886,7 +888,7 @@ public final class ImageLoader {
         public BaseAdapterCallback(BaseAdapter adapter) {
             mAdapter = new WeakReference<BaseAdapter>(adapter);
         }
-        
+
         /** {@inheritDoc} */
         public boolean unwanted() {
             return mAdapter.get() == null;
@@ -918,7 +920,7 @@ public final class ImageLoader {
         public BaseExpandableListAdapterCallback(BaseExpandableListAdapter adapter) {
             mAdapter = new WeakReference<BaseExpandableListAdapter>(adapter);
         }
-        
+
         /** {@inheritDoc} */
         public boolean unwanted() {
             return mAdapter.get() == null;
